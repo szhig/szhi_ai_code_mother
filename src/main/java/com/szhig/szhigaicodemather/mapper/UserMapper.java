@@ -9,5 +9,4 @@ import com.szhig.szhigaicodemather.model.entity.User;
  * @author <a href="https://github.com/szhig"></a>
  */
 public interface UserMapper extends BaseMapper<User> {
-
 }

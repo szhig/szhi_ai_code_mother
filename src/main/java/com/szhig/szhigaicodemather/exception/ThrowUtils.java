@@ -39,7 +39,7 @@ public class ThrowUtils {
      * @param errorCode 错误码
      * @param message 错误信息
      */
-    public static void throwwIf(boolean condition, ErrorCode errorCode, String message) {
+    public static void throwIf(boolean condition, ErrorCode errorCode, String message) {
         throwIf(condition, new BusinessException(errorCode, message));
     }
 }
