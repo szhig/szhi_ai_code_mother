@@ -40,7 +40,7 @@ class SzhigAiCodeMatherApplicationTests {
 
     @Test
     void generateAndSaveCode () {
-        File file = aiCodeGeneratorFacade.generateAndSaveCode("任务记录网站", CodeGenTypeEnum.MULTI_FILE);
+        File file = aiCodeGeneratorFacade.generateAndSaveCode("任务记录网站", CodeGenTypeEnum.MULTI_FILE, 1L);
         Assertions.assertNotNull(file);
     }
 }

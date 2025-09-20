@@ -2,6 +2,12 @@
 spring:
   application:
     name: szhig-ai-code-mather
+  # Session configuration
+  session:
+    # configuration for redis store
+    store-type: redis
+    # session thirty days expiration
+    time-to-live: 2592000
   profiles:
     active: local
   # datasource configuration
@@ -10,11 +16,21 @@ spring:
     url: jdbc:mysql://localhost:3306/szhig_ai_code_mother?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: szgszq12
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      ttl: 3600
 # server configuration
 server:
   port: 8123
   servlet:
     context-path: /api
+    session:
+      cookie:
+        # cookie thirty days expiration
+        max-age: 2592000
 # spriongdoc-openapi configuration
 springdoc:
   group-configs:
