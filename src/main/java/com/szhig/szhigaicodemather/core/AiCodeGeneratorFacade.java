@@ -1,14 +1,20 @@
 package com.szhig.szhigaicodemather.core;
 
+import cn.hutool.json.JSONUtil;
 import com.szhig.szhigaicodemather.ai.AiCodeGeneratorService;
 import com.szhig.szhigaicodemather.ai.AiCodeGeneratorServiceFactory;
 import com.szhig.szhigaicodemather.ai.model.HtmlCodeResult;
 import com.szhig.szhigaicodemather.ai.model.MultiFileCodeResult;
+import com.szhig.szhigaicodemather.ai.model.message.AiResponseMessage;
+import com.szhig.szhigaicodemather.ai.model.message.ToolExecutedMessage;
+import com.szhig.szhigaicodemather.ai.model.message.ToolRequestMessage;
 import com.szhig.szhigaicodemather.core.parse.CodeParserExecutor;
 import com.szhig.szhigaicodemather.core.saver.CodeFileSaverExecutor;
 import com.szhig.szhigaicodemather.exception.BusinessException;
 import com.szhig.szhigaicodemather.exception.ErrorCode;
 import com.szhig.szhigaicodemather.model.enums.CodeGenTypeEnum;
+import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.service.TokenStream;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +52,31 @@ public class AiCodeGeneratorFacade {
             } catch (Exception e) {
                 log.error("保存失败： {}", e.getMessage());
             }
+        });
+    }
+
+    private Flux<String> processTokenStream(TokenStream tokenStream) {
+        return Flux.create(sink -> {
+            tokenStream.onPartialResponse((String parialResponse) -> {
+                AiResponseMessage aiResponseMessage = new AiResponseMessage(parialResponse);
+                sink.next(JSONUtil.toJsonStr(aiResponseMessage));
+            })
+            .onPartialToolExecutionRequest((index, toolExecutionRequest) -> {
+                ToolRequestMessage toolRequestMessage = new ToolRequestMessage(toolExecutionRequest);
+                sink.next(JSONUtil.toJsonStr(toolRequestMessage));
+            })
+            .onToolExecuted((toolExecution) -> {
+                ToolExecutedMessage toolExecutedMessage = new ToolExecutedMessage(toolExecution);
+                sink.next(JSONUtil.toJsonStr(toolExecutedMessage));
+            })
+            .onCompleteResponse((ChatResponse response) -> {
+                sink.complete();
+            })
+            .onError((Throwable error) -> {
+                error.printStackTrace();
+                sink.error(error);
+            })
+            .start();
         });
     }
 
@@ -99,8 +130,8 @@ public class AiCodeGeneratorFacade {
                 yield processCodeStream(result, CodeGenTypeEnum.MULTI_FILE, appId);
             }
             case VUE_PROJECT -> {
-                Flux<String> codeStream = aiCodeGeneratorService.generateVueProjectCodeStream(appId, userMessage);
-                yield processCodeStream(codeStream, CodeGenTypeEnum.MULTI_FILE, appId);
+                TokenStream tokenStream = aiCodeGeneratorService.generateVueProjectCodeStream(appId, userMessage);
+                yield processTokenStream(tokenStream);
             }
             default -> {
                 String errorMessage = "不支持的生成类型：" + codeGenTypeEnum;
