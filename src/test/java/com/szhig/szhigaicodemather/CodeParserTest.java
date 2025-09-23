@@ -5,7 +5,9 @@ import com.szhig.szhigaicodemather.ai.model.MultiFileCodeResult;
 import com.szhig.szhigaicodemather.core.AiCodeGeneratorFacade;
 import com.szhig.szhigaicodemather.core.CodeParser;
 import com.szhig.szhigaicodemather.model.enums.CodeGenTypeEnum;
+import com.szhig.szhigaicodemather.utils.WebScreenshotUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @Description: TODO
  * @Version: 1.0
  */
+
 @SpringBootTest
 public class CodeParserTest {
 
@@ -108,6 +111,14 @@ public class CodeParserTest {
         Assertions.assertNotNull(result);
         String completeContent = String.join("", result);
         Assertions.assertNotNull(completeContent);
+    }
+
+    // 网页截屏测试
+    @Test
+    void saveWebPageScreenshot() {
+        String testUrl = "https://www.codefather.cn";
+        String webPageScreenshot = WebScreenshotUtils.saveWebPageScreenshot(testUrl);
+        Assertions.assertNotNull(webPageScreenshot);
     }
 
 }

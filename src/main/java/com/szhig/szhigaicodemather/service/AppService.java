@@ -2,6 +2,7 @@ package com.szhig.szhigaicodemather.service;
 
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.service.IService;
+import com.szhig.szhigaicodemather.model.dto.app.AppAddRequest;
 import com.szhig.szhigaicodemather.model.dto.app.AppQueryRequest;
 import com.szhig.szhigaicodemather.model.entity.App;
 import com.szhig.szhigaicodemather.model.entity.User;
@@ -27,4 +28,6 @@ public interface AppService extends IService<App> {
     Flux<String> chatToGenCode(Long appId, String message, User loginUser);
 
     boolean removeById(Serializable id);
+
+    Long createApp(AppAddRequest addRequest, User loginUser);
 }
